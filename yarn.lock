@@ -503,7 +503,7 @@
     "@types/yargs" "^15.0.0"
     chalk "^4.0.0"
 
-"@jetersen/octokit-plugin-create-pull-request@^3.9.2-development":
+"@jetersen/octokit-plugin-create-pull-request@3.9.2-development":
   version "3.9.2-development"
   resolved "https://registry.yarnpkg.com/@jetersen/octokit-plugin-create-pull-request/-/octokit-plugin-create-pull-request-3.9.2-development.tgz#b564a8f9d8420cff82429827219a961e3f6065c7"
   integrity sha512-LESyXhfH1npbn7dzTdMSaNNvOVmGCdlUPV/amewnUUpx7sve2PB95mE/qHIUtp3JtUDOnUbW2h4XxCjVmb1yoA==
@@ -3592,9 +3592,6 @@ object.values@^1.1.1:
     define-properties "^1.1.3"
     es-abstract "^1.18.0-next.1"
     has "^1.0.3"
-
-"octokit-plugin-create-pull-request@file:../../work/octokit-plugin-create-pull-request/pkg":
-  version "3.9.2-development"
 
 once@^1.3.0, once@^1.3.1, once@^1.4.0:
   version "1.4.0"
