@@ -18,11 +18,11 @@
   "dependencies": {
     "@actions/core": "1.2.6",
     "@actions/github": "4.0.0",
-    "@jetersen/octokit-plugin-create-pull-request": "3.9.2-development",
     "@octokit/auth-app": "2.10.5",
     "@octokit/core": "3.2.4",
     "@probot/octokit-plugin-config": "1.0.3",
-    "is-base64": "^1.1.0"
+    "is-base64": "^1.1.0",
+    "octokit-plugin-create-pull-request": "3.9.2"
   },
   "devDependencies": {
     "@octokit/types": "^6.2.1",

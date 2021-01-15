@@ -1,6 +1,6 @@
 import {Context} from '@actions/github/lib/context'
 import {GitHub} from '@actions/github/lib/utils'
-import {createPullRequest} from '@jetersen/octokit-plugin-create-pull-request'
+import {createPullRequest} from 'octokit-plugin-create-pull-request'
 import {Log} from './log'
 import {Inputs, Config, Repo, File} from './types'
 import {dump} from 'js-yaml'
