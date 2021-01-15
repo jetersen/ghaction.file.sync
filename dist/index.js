@@ -143,7 +143,9 @@ class FileSync {
                             if (error.message === 'Reference already exists') {
                                 this.log.info(`⛔ Pull request already exists`);
                             }
-                            throw error;
+                            else {
+                                throw error;
+                            }
                         }
                     }
                 }
