@@ -5,7 +5,7 @@ import {
 } from '@actions/github/lib/utils'
 import {createAppAuth} from '@octokit/auth-app'
 import {config} from '@probot/octokit-plugin-config'
-import {createPullRequest} from 'octokit-plugin-create-pull-request'
+import {createPullRequest} from '@jetersen/octokit-plugin-create-pull-request'
 import {inputs, context} from './context'
 import {Log} from './log'
 
