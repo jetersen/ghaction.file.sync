@@ -1,0 +1,10 @@
+name: labels
+on:
+  repository_dispatch:
+    types: [labels-update]
+jobs:
+  labeler:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run Labeler
+        uses: jetersen/ghaction-github-labeler@fix/loadConfigGitHubApi
