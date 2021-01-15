@@ -11,6 +11,14 @@ export class Log {
     return `${this.dryRun ? '[dryrun] ' : ''}${message}`
   }
 
+  startGroup(name: string): void {
+    core.startGroup(name)
+  }
+
+  endGroup(): void {
+    core.endGroup()
+  }
+
   info(message: string): void {
     core.info(this.logMessage(message))
   }

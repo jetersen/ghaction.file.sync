@@ -3,6 +3,7 @@ import {GitHub} from '@actions/github/lib/utils'
 import {createPullRequest} from '@jetersen/octokit-plugin-create-pull-request'
 import {Log} from './log'
 import {Inputs, Config, Repo, File} from './types'
+import {dump} from 'js-yaml'
 
 export class FileSync {
   private readonly configFile
@@ -38,17 +39,18 @@ export class FileSync {
    * name
    */
   async loadConfigFile(): Promise<Config> {
-    this.log.info(
+    this.log.startGroup(
       `📝 Fetching '${this.configFile}' from ${this.repo.owner}/${this.repo.repo}`
     )
     const {config}: {config: Config} = await this.octokit.config.get({
       ...this.repo,
       path: this.configFile
     })
-    this.log.info(`🛠 config: ${JSON.stringify(config, null, 2)}`)
+    this.log.info(`🛠 config:\n${dump(config)}`)
     if (!config.syncs || !config.syncs.length) {
       this.log.warning('😰 Nothing to sync')
     }
+    this.log.endGroup()
     return config
   }
 
@@ -66,9 +68,9 @@ export class FileSync {
     this.log.info('🏃 Running GitHub File Sync')
     const config = await this.loadConfigFile()
     for (const sync of config.syncs) {
+      this.log.startGroup(`📝 Fetching files from ${this.repoStr}`)
       for (const file of sync.files) {
-        // retrieve files
-        this.log.info(`📝 Fetching '${file.src}' from ${this.repoStr}`)
+        this.log.info(`📝 Fetching ${file.src}`)
         const {data} = await this.octokit.repos.getContent({
           ...this.repo,
           path: file.src
@@ -77,6 +79,7 @@ export class FileSync {
           file.content = data.content
         }
       }
+      this.log.endGroup()
       for (const remoteRepoStr of sync.repos) {
         const remoteRepo = this.toRepo(remoteRepoStr)
         this.log.info(`💄 Creating pull request for ${toRepoStr(remoteRepo)}`)
@@ -89,17 +92,24 @@ export class FileSync {
           changes: [filesToChanges(sync.files)]
         }
         if (this.dryRun) {
-          this.log.info('☑ No pull request was created due to dry run')
+          this.log.info('✔ No pull request was created due to dry run')
         } else {
-          const pr = await this.octokit.createPullRequest(prOptions)
-          if (pr === null) {
-            this.log.info(
-              '☑ No pull request was created since there were no changes'
-            )
-          } else {
-            this.log.info(
-              `✅ Pull request created: ${pr.data.number} ${pr.data.html_url}`
-            )
+          try {
+            const pr = await this.octokit.createPullRequest(prOptions)
+            if (pr === null) {
+              this.log.info(
+                '✔ No pull request was created since there were no changes'
+              )
+            } else {
+              this.log.info(
+                `✅ Pull request created: ${pr.data.number} ${pr.data.html_url}`
+              )
+            }
+          } catch (error) {
+            if (error.message === 'Reference already exists') {
+              this.log.info(`⛔ Pull request already exists`)
+            }
+            throw error
           }
         }
       }

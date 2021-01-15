@@ -53,7 +53,7 @@ exports.context = github_1.context;
 /***/ }),
 
 /***/ 2749:
-/***/ (function(__unused_webpack_module, exports) {
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
 
@@ -68,6 +68,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.FileSync = void 0;
+const js_yaml_1 = __nccwpck_require__(1917);
 class FileSync {
     constructor(inputs, context, octokit, log) {
         var _a;
@@ -88,12 +89,13 @@ class FileSync {
      */
     loadConfigFile() {
         return __awaiter(this, void 0, void 0, function* () {
-            this.log.info(`📝 Fetching '${this.configFile}' from ${this.repo.owner}/${this.repo.repo}`);
+            this.log.startGroup(`📝 Fetching '${this.configFile}' from ${this.repo.owner}/${this.repo.repo}`);
             const { config } = yield this.octokit.config.get(Object.assign(Object.assign({}, this.repo), { path: this.configFile }));
-            this.log.info(`🛠 config: ${JSON.stringify(config, null, 2)}`);
+            this.log.info(`🛠 config:\n${js_yaml_1.dump(config)}`);
             if (!config.syncs || !config.syncs.length) {
                 this.log.warning('😰 Nothing to sync');
             }
+            this.log.endGroup();
             return config;
         });
     }
@@ -111,28 +113,37 @@ class FileSync {
             this.log.info('🏃 Running GitHub File Sync');
             const config = yield this.loadConfigFile();
             for (const sync of config.syncs) {
+                this.log.startGroup(`📝 Fetching files from ${this.repoStr}`);
                 for (const file of sync.files) {
-                    // retrieve files
-                    this.log.info(`📝 Fetching '${file.src}' from ${this.repoStr}`);
+                    this.log.info(`📝 Fetching ${file.src}`);
                     const { data } = yield this.octokit.repos.getContent(Object.assign(Object.assign({}, this.repo), { path: file.src }));
                     if ('content' in data) {
                         file.content = data.content;
                     }
                 }
+                this.log.endGroup();
                 for (const remoteRepoStr of sync.repos) {
                     const remoteRepo = this.toRepo(remoteRepoStr);
                     this.log.info(`💄 Creating pull request for ${toRepoStr(remoteRepo)}`);
                     const prOptions = Object.assign(Object.assign({}, remoteRepo), { title: `🔃 Synced files from ${this.repoStr}`, body: `🔃 Synced files from [${this.repoStr}](${this.htmlUrl})\n\nThis PR was created automatically by the [ghaction.file.sync](https://github.com/jetersen/ghaction.file.sync) workflow run [#${this.runId}](${this.htmlUrl}/actions/runs/${this.runId})`, head: `${toRepoStr(this.repo, '-')}-${this.gitSha}`, createWhenEmpty: false, changes: [filesToChanges(sync.files)] });
                     if (this.dryRun) {
-                        this.log.info('☑ No pull request was created due to dry run');
+                        this.log.info('✔ No pull request was created due to dry run');
                     }
                     else {
-                        const pr = yield this.octokit.createPullRequest(prOptions);
-                        if (pr === null) {
-                            this.log.info('☑ No pull request was created since there were no changes');
+                        try {
+                            const pr = yield this.octokit.createPullRequest(prOptions);
+                            if (pr === null) {
+                                this.log.info('✔ No pull request was created since there were no changes');
+                            }
+                            else {
+                                this.log.info(`✅ Pull request created: ${pr.data.number} ${pr.data.html_url}`);
+                            }
                         }
-                        else {
-                            this.log.info(`✅ Pull request created: ${pr.data.number} ${pr.data.html_url}`);
+                        catch (error) {
+                            if (error.message === 'Reference already exists') {
+                                this.log.info(`⛔ Pull request already exists`);
+                            }
+                            throw error;
                         }
                     }
                 }
@@ -198,6 +209,12 @@ class Log {
     }
     logMessage(message) {
         return `${this.dryRun ? '[dryrun] ' : ''}${message}`;
+    }
+    startGroup(name) {
+        core.startGroup(name);
+    }
+    endGroup() {
+        core.endGroup();
     }
     info(message) {
         core.info(this.logMessage(message));
