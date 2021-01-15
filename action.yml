@@ -1,0 +1,30 @@
+name: Your name here
+description: Provide a description here
+author: jetersen
+inputs:
+  githubToken:
+    required: false
+    description: |
+      The GitHub Token used to create commits, branch and pull requests.
+      In most cases you would want to provide an GitHub App credentials since you would be able to update Workflow files and access other repositories.
+      You can get by with a private access token but do be careful.
+    default: ""
+  appId:
+    required: false
+    description: The application id of a GitHub Application with permissions to Contents (Read/Write) and Pull Requests (Read/Write)
+    default: ""
+  privateKey:
+    required: false
+    description: The private key for a GitHub Application to authenticate with.
+    default: ""
+  dryRun:
+    required: false
+    description: ""
+    default: "false"
+  configFile:
+    required: false
+    description: ""
+    default: .github/syncs.yml
+runs:
+  using: node12
+  main: dist/index.js
