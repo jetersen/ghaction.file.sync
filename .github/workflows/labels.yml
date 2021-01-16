@@ -1,6 +1,9 @@
 name: labels
 
 on:
+  repository_dispatch:
+    types:
+      - labels-update
   push:
     branches:
       - "main"
