@@ -53,11 +53,14 @@ export async function getOctokit(
     }
     if (!options) {
       throw new Error(
-        `💥 no credentials provided, please provide a 'github-token' to authenticate as a user or provide a 'app-id' and 'private-key' to authenticate as a GitHub App`
+        `💥 No credentials provided, please provide a 'github-token' to authenticate as a user or provide a 'app-id' and 'private-key' to authenticate as a GitHub App`
       )
     }
   } catch (e) {
-    throw new Error('🔒 Failed to authenticate')
+    log.error(e.message)
+    throw new Error(
+      '🔒 Failed to authenticate, did you remember to install your GitHub App?'
+    )
   } finally {
     core.endGroup()
   }
