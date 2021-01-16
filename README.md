@@ -94,3 +94,6 @@ syncs:
       - src: workflows/labels.yml
         dest: .github/workflows/labels.yml
 ```
+
+[For working example checkout this repository](https://github.com/jetersen/workflows)
+[For a pull request created by the action](https://github.com/jetersen/ghaction.file.sync/pull/1)
