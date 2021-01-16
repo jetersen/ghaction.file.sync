@@ -1,6 +1,9 @@
-name: Your name here
-description: Provide a description here
+name: GitHub File Sync
+description: Sync files from central repository to other repositories across an user/organization
 author: jetersen
+branding:
+  icon: git-pull-request
+  color: blue
 inputs:
   githubToken:
     required: false
